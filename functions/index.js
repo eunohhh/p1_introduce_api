@@ -111,9 +111,9 @@ memberApp.post("/messages", async (req, res) => {
             message: req.body.message,
         };
         const messageDoc = await db.collection(messageCollection).add(message);
-        res.status(200).send(`새로운 멤버 추가 ID: ${messageDoc.id}`);
+        res.status(200).header('Access-Control-Allow-Origin','*').send(`새로운 멤버 추가 ID: ${messageDoc.id}`);
     } catch (error) {
-        res.status(400).send(error.message);
+        res.status(400).header('Access-Control-Allow-Origin','*').send(error.message);
     }
 });
 
@@ -124,9 +124,9 @@ memberApp.patch("/messages/:name", async (req, res) => {
             .collection(messageCollection)
             .doc(req.params.name)
             .update(req.body);
-        res.status(204).send(`${updatedMDoc} 메시지 수정 완료`);
+        res.status(204).header('Access-Control-Allow-Origin','*').send(`${updatedMDoc} 메시지 수정 완료`);
     } catch (error) {
-        res.status(400).send(`메시지를 수정하는 도중 오류가 발생했습니다`);
+        res.status(400).header('Access-Control-Allow-Origin','*').send(`메시지를 수정하는 도중 오류가 발생했습니다`);
     }
 });
 
@@ -138,9 +138,9 @@ memberApp.get("/messages/:name", async (req, res) => {
             .doc(req.params.name)
             .get();
 
-        res.status(200).send({ id: mDoc.id, ...mDoc.data() });
+        res.status(200).header('Access-Control-Allow-Origin','*').send({ id: mDoc.id, ...mDoc.data() });
     } catch (error) {
-        res.status(400).send("멤버를 불러오는데 실패하였습니다");
+        res.status(400).header('Access-Control-Allow-Origin','*').send("멤버를 불러오는데 실패하였습니다");
     }
 });
 
@@ -152,9 +152,9 @@ memberApp.delete("/messages/:name", async (req, res) => {
             .doc(req.params.name)
             .delete();
 
-        res.status(204).send(`정상적으로 삭제 ID: ${deleteMDoc.id}`);
+        res.status(204).header('Access-Control-Allow-Origin','*').send(`정상적으로 삭제 ID: ${deleteMDoc.id}`);
     } catch (error) {
-        res.status(400).send("멤버를 삭제하는데 실패하였습니다");
+        res.status(400).header('Access-Control-Allow-Origin','*').send("멤버를 삭제하는데 실패하였습니다");
     }
 });
 
@@ -166,9 +166,9 @@ memberApp.get("/messages", async (req, res) => {
             id: mDoc.id,
             ...mDoc.data(),
         }));
-        res.status(200).send(messages);
+        res.status(200).header('Access-Control-Allow-Origin','*').send(messages);
     } catch (error) {
-        res.status(400).send("전체 멤버를 불러오는데 실패하였습니다");
+        res.status(400).header('Access-Control-Allow-Origin','*').send("전체 멤버를 불러오는데 실패하였습니다");
     }
 });
 
