@@ -28,6 +28,7 @@ const memberApp = express.Router();
 
 const db = admin.firestore();
 const memberCollection = "members";
+const messageCollection = "messages";
 
 // 해당 부분에 멤버 CRUD 라우트 설정
 // 새로운 멤버 추가
@@ -47,7 +48,7 @@ memberApp.post("/members", async (req, res) => {
     }
 });
 
-  // 기존 멤버 수정
+// 기존 멤버 수정
 memberApp.patch("/members/:membername", async (req, res) => {
     try {
         const updatedMemberDoc = await db
@@ -60,7 +61,7 @@ memberApp.patch("/members/:membername", async (req, res) => {
     }
 });
 
-  // ID로 멤버 불러오기
+// ID로 멤버 불러오기
 memberApp.get("/members/:membername", async (req, res) => {
     try {
         const memberDoc = await db
@@ -74,7 +75,7 @@ memberApp.get("/members/:membername", async (req, res) => {
     }
 });
 
-  // 아이디로 기존 멤버 삭제
+// 아이디로 기존 멤버 삭제
 memberApp.delete("/members/:membername", async (req, res) => {
     try {
         const deleteMemberDoc = await db
@@ -88,7 +89,7 @@ memberApp.delete("/members/:membername", async (req, res) => {
     }
 });
 
-  // 등록된 멤버 모두 조회
+// 등록된 멤버 모두 조회
 memberApp.get("/members", async (req, res) => {
     try {
         const memberDocs = await db.collection(memberCollection).get();
@@ -97,6 +98,75 @@ memberApp.get("/members", async (req, res) => {
             ...memberDoc.data(),
         }));
         res.status(200).send(members);
+    } catch (error) {
+        res.status(400).send("전체 멤버를 불러오는데 실패하였습니다");
+    }
+});
+
+// =============== 여기서부터 메세지 ================
+memberApp.post("/messages", async (req, res) => {
+    try {
+        const message = {
+            name: req.body.name,
+            message: req.body.message,
+        };
+        const messageDoc = await db.collection(messageCollection).add(message);
+        res.status(200).send(`새로운 멤버 추가 ID: ${messageDoc.id}`);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+});
+
+// 기존 메시지 수정
+memberApp.patch("/messages/:name", async (req, res) => {
+    try {
+        const updatedMDoc = await db
+            .collection(messageCollection)
+            .doc(req.params.name)
+            .update(req.body);
+        res.status(204).send(`${updatedMDoc} 메시지 수정 완료`);
+    } catch (error) {
+        res.status(400).send(`메시지를 수정하는 도중 오류가 발생했습니다`);
+    }
+});
+
+  // ID로 메시지 불러오기
+memberApp.get("/messages/:name", async (req, res) => {
+    try {
+        const mDoc = await db
+            .collection(messageCollection)
+            .doc(req.params.name)
+            .get();
+
+        res.status(200).send({ id: mDoc.id, ...mDoc.data() });
+    } catch (error) {
+        res.status(400).send("멤버를 불러오는데 실패하였습니다");
+    }
+});
+
+  // 아이디로 기존 메시지 삭제
+memberApp.delete("/messages/:name", async (req, res) => {
+    try {
+        const deleteMDoc = await db
+            .collection(messageCollection)
+            .doc(req.params.name)
+            .delete();
+
+        res.status(204).send(`정상적으로 삭제 ID: ${deleteMDoc.id}`);
+    } catch (error) {
+        res.status(400).send("멤버를 삭제하는데 실패하였습니다");
+    }
+});
+
+  // 등록된 메시지 모두 조회
+memberApp.get("/messages", async (req, res) => {
+    try {
+        const mDocs = await db.collection(messageCollection).get();
+        const messages = mDocs.docs.map((mDoc) => ({
+            id: mDoc.id,
+            ...mDoc.data(),
+        }));
+        res.status(200).send(messages);
     } catch (error) {
         res.status(400).send("전체 멤버를 불러오는데 실패하였습니다");
     }
