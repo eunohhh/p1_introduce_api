@@ -106,9 +106,10 @@ memberApp.get("/members", async (req, res) => {
 // =============== 여기서부터 메세지 ================
 memberApp.post("/messages", async (req, res) => {
     try {
+        const parsed = JSON.parse(req.body);
         const message = {
-            name: req.body.name,
-            message: req.body.message,
+            name: parsed.name,
+            message: parsed.message,
         };
         const messageDoc = await db.collection(messageCollection).add(message);
         res.status(200).header('Access-Control-Allow-Origin','*').send(`새로운 멤버 추가 ID: ${messageDoc.id}`);
@@ -120,10 +121,11 @@ memberApp.post("/messages", async (req, res) => {
 // 기존 메시지 수정
 memberApp.patch("/messages/:name", async (req, res) => {
     try {
+        const parsed = JSON.parse(req.body);
         const updatedMDoc = await db
             .collection(messageCollection)
-            .doc(req.params.name)
-            .update(req.body);
+            .doc(parsed.name)
+            .update(parsed);
         res.status(204).header('Access-Control-Allow-Origin','*').send(`${updatedMDoc} 메시지 수정 완료`);
     } catch (error) {
         res.status(400).header('Access-Control-Allow-Origin','*').send(`메시지를 수정하는 도중 오류가 발생했습니다`);
@@ -133,9 +135,10 @@ memberApp.patch("/messages/:name", async (req, res) => {
   // ID로 메시지 불러오기
 memberApp.get("/messages/:name", async (req, res) => {
     try {
+        const parsed = JSON.parse(req.body);
         const mDoc = await db
             .collection(messageCollection)
-            .doc(req.params.name)
+            .doc(parsed.name)
             .get();
 
         res.status(200).header('Access-Control-Allow-Origin','*').send({ id: mDoc.id, ...mDoc.data() });
@@ -147,9 +150,10 @@ memberApp.get("/messages/:name", async (req, res) => {
   // 아이디로 기존 메시지 삭제
 memberApp.delete("/messages/:name", async (req, res) => {
     try {
+        const parsed = JSON.parse(req.body);
         const deleteMDoc = await db
             .collection(messageCollection)
-            .doc(req.params.name)
+            .doc(parsed.name)
             .delete();
 
         res.status(204).header('Access-Control-Allow-Origin','*').send(`정상적으로 삭제 ID: ${deleteMDoc.id}`);
