@@ -29,7 +29,7 @@ const memberApp = express.Router();
 const db = admin.firestore();
 const memberCollection = "members";
 
-// 해당 부분에 영화 CRUD 라우트 설정
+// 해당 부분에 멤버 CRUD 라우트 설정
 // 새로운 멤버 추가
 memberApp.post("/members", async (req, res) => {
     try {
@@ -41,26 +41,26 @@ memberApp.post("/members", async (req, res) => {
             blog: req.body.blog,
         };
         const memberDoc = await db.collection(memberCollection).add(member);
-        res.status(200).send(`새로운 영화 추가 ID: ${memberDoc.id}`);
+        res.status(200).send(`새로운 멤버 추가 ID: ${memberDoc.id}`);
     } catch (error) {
         res.status(400).send(error.message);
     }
 });
 
-  // 기존 영화 리뷰 수정
+  // 기존 멤버 수정
 memberApp.patch("/members/:membername", async (req, res) => {
     try {
         const updatedMemberDoc = await db
             .collection(memberCollection)
             .doc(req.params.membername)
             .update(req.body);
-        res.status(204).send(`${updatedMemberDoc} 영화 리뷰 수정 완료`);
+        res.status(204).send(`${updatedMemberDoc} 멤버 수정 완료`);
     } catch (error) {
-        res.status(400).send(`영화 리뷰를 수정하는 도중 오류가 발생했습니다`);
+        res.status(400).send(`멤버를 수정하는 도중 오류가 발생했습니다`);
     }
 });
 
-  // ID로 영화 리뷰 불러오기
+  // ID로 멤버 불러오기
 memberApp.get("/members/:membername", async (req, res) => {
     try {
         const memberDoc = await db
@@ -70,11 +70,11 @@ memberApp.get("/members/:membername", async (req, res) => {
 
         res.status(200).send({ id: memberDoc.id, ...memberDoc.data() });
     } catch (error) {
-        res.status(400).send("영화 리뷰를 불러오는데 실패하였습니다");
+        res.status(400).send("멤버를 불러오는데 실패하였습니다");
     }
 });
 
-  // 아이디로 기존 영화 리뷰 삭제
+  // 아이디로 기존 멤버 삭제
 memberApp.delete("/members/:membername", async (req, res) => {
     try {
         const deleteMemberDoc = await db
@@ -84,11 +84,11 @@ memberApp.delete("/members/:membername", async (req, res) => {
 
         res.status(204).send(`정상적으로 삭제 ID: ${deleteMemberDoc.id}`);
     } catch (error) {
-        res.status(400).send("영화 리뷰를 삭제하는데 실패하였습니다");
+        res.status(400).send("멤버를 삭제하는데 실패하였습니다");
     }
 });
 
-  // 등록된 영화 리뷰 모두 조회
+  // 등록된 멤버 모두 조회
 memberApp.get("/members", async (req, res) => {
     try {
         const memberDocs = await db.collection(memberCollection).get();
@@ -98,7 +98,7 @@ memberApp.get("/members", async (req, res) => {
         }));
         res.status(200).send(members);
     } catch (error) {
-        res.status(400).send("전체 영화 리뷰를 불러오는데 실패하였습니다");
+        res.status(400).send("전체 멤버를 불러오는데 실패하였습니다");
     }
 });
 
