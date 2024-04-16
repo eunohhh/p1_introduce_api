@@ -110,6 +110,7 @@ memberApp.post("/messages", async (req, res) => {
         const message = {
             name: parsed.name,
             message: parsed.message,
+            time: new Date()
         };
         const messageDoc = await db.collection(messageCollection).doc(parsed.name).set(message);
         res.status(200).header('Access-Control-Allow-Origin','*').send(`새로운 멤버 추가 ID: ${messageDoc.id}`);
