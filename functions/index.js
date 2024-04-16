@@ -21,6 +21,7 @@ const logger = require("firebase-functions/logger");
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const express = require("express");
+const cors = require('cors');
 
 admin.initializeApp(); // 어드민 초기화. 클라우드 함수, 호스팅만 사용할 경우 따로 설정파일을 넘겨주지 않아도 됨
 const app = express(); 
@@ -29,6 +30,11 @@ const memberApp = express.Router();
 const db = admin.firestore();
 const memberCollection = "members";
 const messageCollection = "messages";
+
+const corsOptions = {
+    origin: '*',  // 클라이언트 주소
+    methods: ['GET', 'POST', 'DELETE']  // 허용할 메서드 목록
+};
 
 // 해당 부분에 멤버 CRUD 라우트 설정
 // 새로운 멤버 추가
@@ -136,10 +142,9 @@ memberApp.patch("/messages/:name", async (req, res) => {
   // ID로 메시지 불러오기
 memberApp.get("/messages/:name", async (req, res) => {
     try {
-        const parsed = JSON.parse(req.body);
         const mDoc = await db
             .collection(messageCollection)
-            .doc(parsed.name)
+            .doc(req.params.name)
             .get();
 
         res.status(200).header('Access-Control-Allow-Origin','*').send({ id: mDoc.id, ...mDoc.data() });
@@ -151,10 +156,10 @@ memberApp.get("/messages/:name", async (req, res) => {
   // 아이디로 기존 메시지 삭제
 memberApp.delete("/messages/:name", async (req, res) => {
     try {
-        const parsed = JSON.parse(req.body);
+        console.log(req.params)
         const deleteMDoc = await db
             .collection(messageCollection)
-            .doc(parsed.name)
+            .doc(req.params.name)
             .delete();
 
         res.status(204).header('Access-Control-Allow-Origin','*').send(`정상적으로 삭제 ID: ${deleteMDoc.id}`);
@@ -177,6 +182,7 @@ memberApp.get("/messages", async (req, res) => {
     }
 });
 
+app.use(cors(corsOptions));
 app.use(express.json()); // body-parser 설정
 app.use("/api", memberApp); 
 
